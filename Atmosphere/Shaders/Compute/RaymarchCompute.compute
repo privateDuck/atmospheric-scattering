@@ -1,0 +1,106 @@
+#pragma kernel SkyFrustrum
+#pragma kernel SkySphere
+#pragma kernel FogFrustrum
+
+
+int skyScatteringSteps;
+uint2 skyTexSize;
+
+uint fogScatteringSteps;
+uint fogTexSize;
+float nearClip;
+float farClip;
+bool includePlanetShadow;
+#include <../Include/Atmosphere.hlsl>
+
+RWTexture2D<float4> sky;
+RWTexture3D<float4> luminanceAtDepth;
+RWTexture3D<float4> transmittanceAtDepth;
+
+[numthreads(8,8,1)]
+void SkyFrustrum (uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= skyTexSize.x || id.y >= skyTexSize.y) { return; }
+	
+	float2 texCoord = id.xy / float2(skyTexSize - 1.0);
+	float3 viewDir = calculateViewDir(texCoord);
+
+	float2 hitInfo = raySphere(planetCenter, atmosphereRadius, camPos, viewDir);
+	float dstToAtmosphere = hitInfo.x;
+	float dstThroughAtmosphere = hitInfo.y;
+	
+	float3 col = 0;
+	
+	if (dstThroughAtmosphere > 0) {
+		float3 inPoint = camPos + viewDir * dstToAtmosphere;
+        float shadowRadius = includePlanetShadow ? planetRadius : 0;
+		ScatteringResult result = raymarch(inPoint, viewDir, dstThroughAtmosphere, skyScatteringSteps, shadowRadius);
+		col = result.luminance;
+	}
+	sky[id.xy] = float4(col, 1);
+}
+
+[numthreads(8,8,1)]
+void SkySphere (uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= skyTexSize.x || id.y >= skyTexSize.y) return;
+
+	float2 tex = id.xy / float2(skyTexSize - 1.0);
+	tex = tex * 2 - 1;
+
+	//-pi/2<Phi<pi/2
+	// -pi<theta<pi
+
+	float Phi = tex.y*PI*0.5; //(2*tex.y - 1)*PI*0.5f;
+	float theta = -tex.x*PI; //2*(tex.x - 0.5)*PI;
+
+	float3 viewDir = float3(cos(Phi)*cos(theta),sin(Phi),cos(Phi)*sin(theta));
+
+	float2 hitInfo = raySphere(planetCenter, atmosphereRadius, camPos, viewDir);
+	float dstToAtmosphere = hitInfo.x;
+	float dstThroughAtmosphere = hitInfo.y;
+
+	float3 col = 0;
+
+	if (dstThroughAtmosphere > 0) {
+		float3 inPoint = camPos + viewDir * dstToAtmosphere;
+        float shadowRadius = includePlanetShadow ? planetRadius : 0;
+		ScatteringResult result = raymarch(inPoint, viewDir, dstThroughAtmosphere, skyScatteringSteps, shadowRadius);
+		col = result.luminance;
+	}
+
+	sky[id.xy] = float4(col, 1);
+}
+
+[numthreads(4,4,4)]
+void FogFrustrum (uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= fogTexSize || id.y >= fogTexSize || id.z >= fogTexSize) { return; }
+
+	float2 uv = id.xy / float2(fogTexSize - 1.0,fogTexSize - 1.0);
+	float depthT = id.z / (fogTexSize - 1.0);
+
+	float3 rayDir = calculateViewDir(uv);
+	float3 rayPos = camPos + rayDir * nearClip;
+
+	float2 atmosphereHitInfo = raySphere(planetCenter, atmosphereRadius, rayPos, rayDir);
+	float dstToAtmosphere = atmosphereHitInfo.x;
+	float dstThroughAtmosphere = atmosphereHitInfo.y;
+	
+	float3 col = 0;
+	float3 transmittance = 1;
+	
+	if (dstThroughAtmosphere > 0) {
+		float3 inPoint = rayPos + rayDir * dstToAtmosphere;
+		float rayLength = min(dstThroughAtmosphere, (planetRadius - nearClip) * depthT);
+		ScatteringResult result = raymarch(inPoint, rayDir, rayLength, fogScatteringSteps, 0); // dont include earth shadow (causes issues due to low texture size)
+		col = result.luminance;
+		transmittance = result.transmittance;
+	}
+	
+
+	float avgTransmittance = dot(transmittance, 1.0/3.0);
+
+	luminanceAtDepth[id] = float4(col, avgTransmittance);
+	transmittanceAtDepth[id] = float4(transmittance, depthT);
+}

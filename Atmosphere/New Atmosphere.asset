@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b4823daba4025f49978692e93471c8b, type: 3}
+  m_Name: New Atmosphere
+  m_EditorClassIdentifier: 
+  rayleighCoef: {x: 0.3811172, y: 1.1597042, z: 2.0437105}
+  planetRadius: 600000
+  atmosphereThickness: 100000
+  planetCenter: {x: 0, y: -600000, z: 0}
+  wavelengthsRGB: {x: 700, y: 530, z: 460}
+  wavelengthScale: 550
+  rayleighDensityAvg: 0.25
+  mieDensityAvg: 0.352
+  mieCoef: 0.15
+  mieAbsorption: 0.2
+  ozonePeakAltitude: 0.76
+  ozoneDensityFalloff: 2.08
+  ozoneStrenght: 2.6
+  ozoneAbsorption: {x: 0.4, y: 0.19215687, z: 0.07}
+  sunSize: 2.55
+  sunBlurA: 0.69
+  sunBlurB: 0.16
+  transmittanceCompute: {fileID: 7200000, guid: 2c69d93f74c185543a337bc9829dbfb6, type: 3}
+  transmittanceLUTSize: {x: 128, y: 128}
+  aerialCompute: {fileID: 7200000, guid: b1967319c18c5df4b807dbebd35cbdc3, type: 3}
+  aerialLUTSize: 32
+  aerialPerspectiveStrength: 1
+  skyViewScattingSteps: 100
+  skyCompute: {fileID: 7200000, guid: 71decf56cba4a03459f05cff1428eaa1, type: 3}
+  skySize: {x: 128, y: 128}
+  skyTransmittanceWeight: 0
+  skyMaterial: {fileID: 2100000, guid: c5fadcdc1c86e4b4592e676c731dd308, type: 2}
+  AerialPostMaterial: {fileID: 2100000, guid: f3da1bd0b6e183348bc41772a7e64e6f, type: 2}
+  transmittanceLUT: {fileID: 0}
+  skyLUT: {fileID: 0}
+  aerialLuminance: {fileID: 0}
+  aerialTransmittance: {fileID: 0}
+  cpuTransmittanceTexture: {fileID: 0}
+  requiresInitialization: 0

@@ -1,0 +1,52 @@
+#pragma kernel CSMain
+#define PI 3.1415926535
+static uint sampleRate = 256;
+
+struct Star
+{
+    float3 position;
+    float3 color;
+    float size;
+};
+
+RWStructuredBuffer<Star> stars;
+StructuredBuffer<float> twinkleBuffer;
+StructuredBuffer<float3> colorBuffer;
+
+float4 seed;
+float2 globalSize;
+float radius;
+float time;
+float twinkleSpeed;
+
+float rand(float3 uv)
+{
+    return frac(sin(dot(uv.xyz,float3(12.9898,78.233,45.5432)))*43758.5453);
+}
+
+float3 pointOnSphere(float u,float v,float r)
+{
+    float theta = 2*PI*u;
+    float phi = acos(2*v-1);
+
+    float x = r*sin(phi)*cos(theta);
+    float y = r*sin(phi)*sin(theta);
+    float z = r*cos(phi);
+    return float3(x,y,z);
+}
+
+[numthreads(64,1,1)]
+void CSMain (uint id : SV_DispatchThreadID)
+{
+    Star star;
+
+    float sampleTime = time*(float(sampleRate)/twinkleSpeed) + rand(seed.ywx/(id + 1))*sampleRate;
+    uint twinkleIndex = round(frac(sampleTime/float(sampleRate))*(sampleRate - 1));
+
+    uint colorIndex = round(rand(seed.zyw/(id + 1))*(sampleRate - 1));
+
+    star.position = pointOnSphere(rand(seed.xyz/(id+1)),rand(seed.ywx/(id+1)),radius);
+    star.color = colorBuffer[colorIndex] * twinkleBuffer[twinkleIndex];
+    star.size = lerp(globalSize.x , globalSize.y, rand(seed.xyw / (id + 1))) * twinkleBuffer[twinkleIndex];
+    stars[id] = star;
+}

@@ -1,0 +1,24 @@
+#pragma kernel Transmittance
+
+#define Transmittance_Compute
+#include <../Include/Atm_TransmittanceFunctions.hlsl>
+
+uint size;
+
+[numthreads(8,8,1)]
+void Transmittance (uint3 id : SV_DispatchThreadID)
+{
+    float2 uv = id.xy/float2(size-1.0,size-1.0);
+    float distFromCenter = atmosphereThickness * uv.y + planetRadius;
+
+    float3 inPoint = float3(0, distFromCenter, 0);
+
+	float y = -2.0 * uv.x + 1.0;
+	float x = sin(acos(y));
+	float3 dir = normalize(float3(x, y, 0));
+	
+	float2 hitInfo = raySphere(0, atmosphereRadius, inPoint, dir);
+	float3 transmittance = getSunTransmittance(inPoint, hitInfo.y, dir);
+
+	transmittanceLUT[id.xy] = transmittance;
+}

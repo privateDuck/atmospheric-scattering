@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5235e565a09396049920231066f51c92, type: 3}
+  m_Name: Atmosphere Settings
+  m_EditorClassIdentifier: 
+  EnableAtmosphere: 1
+  skyType: 0
+  planetRadius: 600000
+  atmosphereThickness: 100000.01
+  planetCenter: {x: 0, y: -600000, z: 0}
+  includePlanetShadow: 1
+  nightSkyTint: {r: 0.098185, g: 0.098185, b: 0.269, a: 1}
+  nightSkyTintWeight: 0.145
+  rayleighCoef: {x: 0.3811172, y: 1.1597042, z: 2.0437105}
+  wavelengthsRGB: {x: 700, y: 530, z: 460}
+  wavelengthScale: 550
+  rayleighDensityAvg: 0.237
+  mieDensityAvg: 0.012
+  mieCoef: 0.16
+  mieAbsorption: 0.17
+  ozonePeakAltitude: 0.25
+  ozoneDensityFalloff: 10
+  ozoneStrenght: 0.17
+  ozoneAbsorption: {x: 0.32, y: 0.64, z: 0.1}
+  sunSize: 3
+  sunBlurA: 2
+  sunBlurB: 0.05
+  transmittanceCompute: {fileID: 7200000, guid: 2c69d93f74c185543a337bc9829dbfb6, type: 3}
+  raymarchCompute: {fileID: 7200000, guid: 3ed7fe39606125243af55924a1ceecc0, type: 3}
+  skyTextureResolution: {x: 128, y: 128}
+  skyScatteringSteps: 100
+  fogTextureResolution: 32
+  fogScatteringSteps: 20
+  fogStrength: 0.442
+  sunTransmittanceResolution: 128
+  sunTransmittanceSteps: 50
+  ditherTexture: {fileID: 0}
+  ditherStrength: 0.8
+  transmittanceLUT: {fileID: 0}
+  skyLUT: {fileID: 0}
+  aerialLuminance: {fileID: 0}
+  aerialTransmittance: {fileID: 0}
+  transmittanceComputeInstance: {fileID: 0}
+  autoUpdateShaderParameters: 1
+  requiresInitialization: 0
